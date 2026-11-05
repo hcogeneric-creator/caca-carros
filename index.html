@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Caça-Carros Norte PR</title>
+<meta name="description" content="Carros usados de R$ 12 a 20 mil em Maringá, Londrina e região, com FIPE, ficha técnica, defeitos crônicos e ranking.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0} img{max-width:100%} [hidden]{display:none!important}
+
+/* Layout: classificado de estrada — faixa azul de placa no topo, ranking em trilho, grade de anúncios com ficha técnica no verso */
+:root{
+  --bg:#EEF0EC; --paper:#FFFFFF; --ink:#1A1E23; --muted:#5D6670; --line:#D7DBD3;
+  --plate:#1B48B0; --plate-ink:#FFFFFF; --sign:#E2A11B; --sign-ink:#1A1E23;
+  --good:#2D7A4C; --good-bg:#E3F1E8; --warn:#9A6514; --warn-bg:#FAEFD9; --bad:#AE3434; --bad-bg:#F7E2E2;
+  --shade:rgba(26,30,35,.06);
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14171B; --paper:#1D2126; --ink:#E9ECEF; --muted:#A1AAB3; --line:#30363D;
+  --plate:#4F7BE0; --plate-ink:#0D1320; --sign:#F0B53A; --sign-ink:#15181C;
+  --good:#6CCB92; --good-bg:#1E3328; --warn:#E6B45A; --warn-bg:#3A2F1A; --bad:#EE8A8A; --bad-bg:#3D2323;
+  --shade:rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171B; --paper:#1D2126; --ink:#E9ECEF; --muted:#A1AAB3; --line:#30363D;
+  --plate:#4F7BE0; --plate-ink:#0D1320; --sign:#F0B53A; --sign-ink:#15181C;
+  --good:#6CCB92; --good-bg:#1E3328; --warn:#E6B45A; --warn-bg:#3A2F1A; --bad:#EE8A8A; --bad-bg:#3D2323;
+  --shade:rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body)}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.05}
+a{color:var(--plate)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sign);outline-offset:2px}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+
+/* faixa de placa */
+.band{background:var(--plate);color:var(--plate-ink)}
+.band .wrap{padding-block:10px;display:flex;justify-content:space-between;gap:12px;align-items:center;font:600 13px/1 var(--f-body);letter-spacing:.14em;text-transform:uppercase}
+.band b{font-family:var(--f-display);font-size:15px;letter-spacing:.2em}
+header.top .wrap{padding-block:28px 20px;display:grid;gap:18px}
+.title-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+h1{font-size:clamp(40px,7vw,68px);font-weight:700;letter-spacing:-.01em;text-transform:uppercase}
+.lede{color:var(--muted);max-width:62ch;margin:6px 0 0}
+.facts{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 10px;font-size:13px;white-space:nowrap}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--good)}
+.chip.off .dot{background:var(--warn)}
+.cities{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--muted)}
+.cities span::before{content:"";display:inline-block;width:6px;height:6px;margin-right:6px;background:var(--sign);transform:rotate(45deg);vertical-align:middle}
+
+section{padding-block:22px}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 16px;margin-bottom:14px}
+h2{font-size:clamp(26px,4vw,36px);text-transform:uppercase;letter-spacing:.01em}
+.sec-head p{margin:0;color:var(--muted);max-width:70ch;font-size:15px}
+
+/* ranking */
+.rank{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;list-style:none;margin:0;padding:0}
+.rk{background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:grid;grid-template-rows:auto 1fr}
+.rk .ph{position:relative}
+.pos{position:absolute;left:10px;top:10px;background:var(--sign);color:var(--sign-ink);font:700 22px/1 var(--f-display);padding:6px 10px;border-radius:6px;box-shadow:0 2px 6px var(--shade)}
+.rk .body{padding:12px 14px 14px;display:grid;gap:8px;align-content:start}
+.why{margin:0;font-size:14px;color:var(--muted)}
+
+/* fotos */
+.ph{aspect-ratio:4/3;max-width:100%;background:repeating-linear-gradient(135deg,var(--bg) 0 10px,var(--paper) 10px 20px);position:relative;overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .nav{position:absolute;inset:auto 8px 8px auto;display:flex;gap:6px}
+.ph .nav button{width:32px;height:32px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;font-size:16px}
+.ph .count{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;font:500 12px/1 var(--f-data);padding:5px 7px;border-radius:4px}
+.ph .empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:6px;padding:12px;color:var(--muted);font-size:14px}
+.ph .empty a{font-weight:600}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.card .body{padding:12px 14px 14px;display:grid;gap:10px;flex:1;align-content:start}
+.ttl{font-size:21px;font-weight:700;text-transform:uppercase;letter-spacing:.01em}
+.price-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.price{font:600 26px/1 var(--f-data);letter-spacing:-.02em}
+.fipe{font-size:13px;color:var(--muted);text-align:right;line-height:1.35}
+.delta{display:inline-block;font:500 12px/1 var(--f-data);padding:4px 6px;border-radius:4px;margin-top:3px}
+.delta.good{background:var(--good-bg);color:var(--good)} .delta.warn{background:var(--warn-bg);color:var(--warn)} .delta.bad{background:var(--bad-bg);color:var(--bad)}
+.specs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0}
+.specs div{border-top:1px solid var(--line);padding-top:6px;min-width:0}
+.specs dt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.specs dd{margin:0;font:500 14px/1.25 var(--f-data);overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px;background:var(--bg);color:var(--muted)}
+.tag.new{background:var(--sign);color:var(--sign-ink)}
+.tag.alert{background:var(--warn-bg);color:var(--warn)}
+.tag.ok{background:var(--good-bg);color:var(--good)}
+.score{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.meter{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--plate)}
+.score b{font:600 15px/1 var(--f-data);color:var(--ink)}
+.note{margin:0;font-size:14px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px}
+details{border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--plate)}
+.ficha{display:grid;gap:8px;font-size:14px;margin-top:8px}
+.ficha h4{margin:0;font:600 12px/1.2 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ficha ul{margin:2px 0 0;padding-left:18px}
+.ficha .src a{font-size:12px;word-break:break-all}
+.cta{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:auto;padding-top:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;padding:9px 14px;font-weight:600;font-size:14px;text-decoration:none;border:1px solid var(--plate);background:var(--plate);color:var(--plate-ink);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--plate)}
+.src-badge{font:500 12px/1 var(--f-data);color:var(--muted)}
+
+/* filtros */
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.filters select,.filters input{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:8px 10px;font-size:14px;min-width:0}
+.filters input{flex:1 1 180px}
+.filters .res{margin-left:auto;font-size:14px;color:var(--muted)}
+
+/* tabela de modelos */
+.tbl-wrap{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px/1.2 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+td.n{font-family:var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.lvl{font-size:12px;font-weight:600;padding:2px 7px;border-radius:4px}
+.lvl.baixa{background:var(--good-bg);color:var(--good)} .lvl.média,.lvl.media{background:var(--warn-bg);color:var(--warn)} .lvl.alta{background:var(--bad-bg);color:var(--bad)}
+
+/* importação de fotos */
+.import{background:var(--paper);border:1px dashed var(--plate);border-radius:10px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.import p{margin:0;font-size:14px;color:var(--muted);max-width:70ch}
+.import .prog{font:500 13px/1.3 var(--f-data)}
+.method{font-size:14px;color:var(--muted);display:grid;gap:6px;max-width:80ch}
+.method code{font-family:var(--f-data);font-size:13px}
+.pricebox{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:14px}
+.pb-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 16px}
+.pb-range{font:600 clamp(24px,4vw,32px)/1 var(--f-data);letter-spacing:-.02em}
+.pb-range small{font:500 14px/1 var(--f-body);color:var(--muted);letter-spacing:0;margin-left:8px}
+.hist{display:flex;align-items:flex-end;gap:3px;height:64px}
+.hist i{flex:1;background:var(--line);border-radius:2px 2px 0 0;min-height:2px;position:relative}
+.hist i.on{background:var(--plate)} .hist i.ideal{background:var(--sign)}
+.dual{position:relative;height:28px}
+.dual input{position:absolute;inset:0;width:100%;margin:0;background:none;pointer-events:none;-webkit-appearance:none;appearance:none;height:28px}
+.dual input::-webkit-slider-runnable-track{height:6px;background:transparent}
+.dual input::-moz-range-track{height:6px;background:transparent}
+.dual input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:24px;height:24px;border-radius:50%;background:var(--paper);border:3px solid var(--plate);margin-top:-9px;cursor:grab;box-shadow:0 1px 4px var(--shade)}
+.dual input::-moz-range-thumb{pointer-events:auto;width:18px;height:18px;border-radius:50%;background:var(--paper);border:3px solid var(--plate);cursor:grab}
+.dual .rail{position:absolute;left:0;right:0;top:11px;height:6px;border-radius:3px;background:var(--line)}
+.dual .fill{position:absolute;top:11px;height:6px;border-radius:3px;background:var(--plate)}
+.ticks{display:flex;justify-content:space-between;font:500 12px/1 var(--f-data);color:var(--muted)}
+.pb-opts{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:var(--paper);padding:7px 12px;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--plate);color:var(--plate-ink)}
+.weights{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px 22px}
+.wt{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;font-size:14px;min-width:0}
+.wt b{font:600 14px/1 var(--f-data);color:var(--plate);min-width:2ch;text-align:right}
+.wt input{grid-column:1/-1;width:100%;accent-color:var(--plate)}
+.wt small{grid-column:1/-1;color:var(--muted);font-size:12px;line-height:1.3}
+.kpy.good{color:var(--good)} .kpy.bad{color:var(--bad)} .kpy.warn{color:var(--warn)}
+.ph.strip{display:flex;overflow-x:auto;scroll-snap-type:x mandatory}
+.ph.strip img{flex:0 0 100%;scroll-snap-align:start}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:14px;color:var(--muted)}
+.toolbar .btn{padding:7px 12px}
+.btn[disabled]{opacity:.6;cursor:progress}
+.pb-opts select{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:6px 8px;font-size:14px}
+footer .wrap{padding-block:26px 40px;color:var(--muted);font-size:13px}
+@media (max-width:520px){.specs{grid-template-columns:repeat(2,1fr)} .price{font-size:23px}}
+@media (prefers-reduced-motion:no-preference){.card,.rk{transition:box-shadow .15s} .card:hover,.rk:hover{box-shadow:0 6px 20px var(--shade)}}
+</style>
+
+</head><body>
+<div class="band"><div class="wrap"><b>BR · PR · SP</b><span>R$ 12 mil – R$ 20 mil · ano 2001+</span></div></div>
+
+<header class="top"><div class="wrap">
+  <div class="title-row">
+    <div>
+      <h1>Caça-Carros Norte PR</h1>
+      <p class="lede">Usados com documentação sem pendência declarada, nas sete cidades da busca, com foto, preço, FIPE e a ficha de cada modelo: potência, consumo, autonomia, defeitos crônicos e custo de manutenção.</p>
+    </div>
+    <div class="facts" id="facts"></div>
+  </div>
+  <div class="cities" id="cities"></div>
+
+</div></header>
+
+<main>
+  <section style="padding-bottom:4px"><div class="wrap">
+    <div class="pricebox" aria-label="Faixa de preço">
+      <div class="pb-top"><div class="pb-range num" id="pb-label"></div><span id="pb-count" style="color:var(--muted);font-size:14px"></span></div>
+      <div class="hist" id="hist" aria-hidden="true"></div>
+      <div class="dual"><span class="rail"></span><span class="fill" id="pb-fill"></span>
+        <input type="range" id="p-min" min="12000" max="20000" step="500" value="13000" aria-label="Preço mínimo">
+        <input type="range" id="p-max" min="12000" max="20000" step="500" value="17000" aria-label="Preço máximo"></div>
+      <div class="ticks"><span>12 mil</span><span>14 mil</span><span>16 mil</span><span>18 mil</span><span>20 mil</span></div>
+      <div class="pb-opts">
+        <label>Preço ideal <select id="p-ideal"></select></label>
+        <label style="cursor:pointer"><input type="checkbox" id="p-below" checked> Só abaixo da FIPE</label>
+      </div>
+    </div>
+    <div class="pricebox" aria-label="Pesos do ranking" style="margin-top:12px">
+      <div class="pb-top"><h3 style="font-size:24px;text-transform:uppercase">O que pesa no ranking</h3>
+        <span class="seg" role="group" aria-label="Atalhos de ranking" id="presets"></span></div>
+      <div class="weights" id="weights"></div>
+      <p style="margin:0;font-size:13px;color:var(--muted)">Km por ano: até 10 mil km/ano conta a favor e acima disso conta contra; abaixo de 2 mil km/ano a quilometragem é tratada como duvidosa.</p>
+    </div>
+  </div></section>
+
+  <section><div class="wrap">
+    <div class="sec-head">
+      <h2>Top 10 para viagens de até 500 km</h2>
+      <p id="rank-why"></p>
+    </div>
+    <ol class="rank" id="rank"></ol>
+  </div></section>
+
+
+  <section><div class="wrap">
+    <div class="sec-head">
+      <h2>Todos os anúncios</h2>
+      <p>Dentro da faixa de preço escolhida acima, ordenados pelo ranking. Os de leilão, sinistro, multa, financiamento em aberto ou motor fundido ficaram de fora.</p>
+    </div>
+    <div class="filters" role="search">
+      <select id="f-city" aria-label="Cidade"><option value="">Todas as cidades</option></select>
+      <select id="f-gear" aria-label="Câmbio"><option value="">Manual e automático</option><option value="M">Manual</option><option value="A">Automático</option></select>
+      <select id="f-sort" aria-label="Ordenar">
+        <option value="score">Melhor ranking</option><option value="ideal">Mais perto do preço ideal</option><option value="price">Menor preço</option>
+        <option value="fipe">Mais abaixo da FIPE</option><option value="km">Menor km</option><option value="kpy">Menor km por ano</option>
+        <option value="year">Mais novo</option><option value="date">Anunciado há menos tempo</option>
+      </select>
+      <label class="chip" style="cursor:pointer"><input type="checkbox" id="f-clean"> Esconder anúncios com reparo citado</label>
+      <input id="f-q" type="search" placeholder="Buscar modelo, ex.: Fiesta" aria-label="Buscar modelo">
+      <span class="res" id="res"></span>
+    </div>
+    <div class="grid" id="grid" style="margin-top:14px"></div>
+  </div></section>
+
+  <section><div class="wrap">
+    <div class="sec-head">
+      <h2>Ranking dos modelos</h2>
+      <p>Comparação entre os modelos encontrados, a partir de testes do Inmetro e de revistas, avaliações de reparadores e relatos de donos. Consumo com gasolina.</p>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Modelo</th><th>Anúncios</th><th>Potência</th><th>Consumo estrada</th><th>Autonomia</th><th>Manutenção</th><th>Confiab.</th><th>Viagem</th><th>Principal defeito crônico</th></tr></thead>
+      <tbody id="models"></tbody>
+    </table></div>
+  </div></section>
+
+  <section><div class="wrap method">
+    <h3 style="font-size:22px;text-transform:uppercase">Como a busca funciona</h3>
+    <p>Filtro: preço entre R$ 12.000 e R$ 20.000, ano 2001 ou mais novo, anunciado em Maringá, Sarandi, Marialva, Londrina, Santo Antônio da Platina, Jacarezinho ou Ourinhos. "Documento ok" significa que o anúncio não marca leilão, multas ou financiamento e que a descrição não cita leilão, sinistro, restrição ou débito. Confirme sempre com o número da placa no Detran antes de pagar.</p>
+    <p>Esta página é atualizada todo dia de manhã com anúncios novos da OLX e do Facebook Marketplace. Os carros marcados como Novo entraram nas últimas buscas.</p>
+  </div></section>
+</main>
+<footer><div class="wrap" id="foot"></div></footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const brl = v => v == null ? '—' : 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+const kmf = v => (v && v > 1000) ? Math.round(v/1000) + ' mil km' : 'não inf.';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let EXPORT = null, mcpRef = null, dlRef = null, TOP = [], SHOWN = [];
+let DATA = null, NEW = {}, GONE = {}, PHOTOS = {}, dbRef = null, assetsRef = null;
+const slide = {};
+const PF = {min:13000, max:17000, ideal:13000, below:true, mode:'price'};
+try { Object.assign(PF, JSON.parse(localStorage.getItem('cc-price')||'{}')); } catch(e){}
+const savePF = () => { try { localStorage.setItem('cc-price', JSON.stringify(PF)); } catch(e){} };
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const CRIT = [
+  ['ideal','Preço perto do ideal','quanto mais perto do preço ideal, melhor'],
+  ['fipe','% abaixo da FIPE','desconto sobre a tabela; acima de 35% é suspeito'],
+  ['kpy','Km por ano','média de 10 mil km/ano como referência'],
+  ['km','Km total','quilometragem absoluta do painel'],
+  ['ano','Ano','carros mais novos pontuam mais'],
+  ['aut','Autonomia','km por tanque na estrada'],
+  ['pecas','Peças baratas','custo e oferta de peças do modelo'],
+  ['conf','Confiabilidade','defeitos crônicos e avaliação de reparadores'],
+  ['viagem','Conforto na estrada','estabilidade e fôlego com 4 pessoas'],
+];
+const PRESETS = {
+  'Meu perfil': {ideal:8, fipe:8, kpy:8, km:3, ano:4, aut:6, pecas:7, conf:6, viagem:3},
+  'Equilibrado': {ideal:3, fipe:4, kpy:5, km:3, ano:3, aut:4, pecas:7, conf:9, viagem:5},
+  'Km por ano': {ideal:1, fipe:1, kpy:10, km:3, ano:1, aut:1, pecas:1, conf:1, viagem:1},
+  'Mais novo': {ideal:1, fipe:1, kpy:2, km:1, ano:10, aut:1, pecas:1, conf:1, viagem:1},
+  '% abaixo da FIPE': {ideal:1, fipe:10, kpy:2, km:1, ano:1, aut:1, pecas:1, conf:1, viagem:1},
+};
+const W = {...PRESETS['Meu perfil']};
+try { Object.assign(W, JSON.parse(localStorage.getItem('cc-w')||'{}')); } catch(e){}
+const saveW = () => { try { localStorage.setItem('cc-w', JSON.stringify(W)); } catch(e){} };
+const NOW_YEAR = 2026;
+function kmPerYear(c){
+  if (!c.km || c.km < 1000) return null;
+  return c.km / Math.max(1, NOW_YEAR - c.year + 0.5);
+}
+function parts(c){
+  const f = ficha(c) || {};
+  const man = {baixa:10,'média':6,media:6,alta:3}[String(f.manutencao||'').toLowerCase()] ?? 5;
+  const d = c.fipe ? (c.fipe - c.price)/c.fipe : null;
+  const kpy = kmPerYear(c);
+  let kpyS = 3;                                             // sem km: incerteza pesa contra
+  if (kpy != null) kpyS = kpy < 2000 ? 4 : kpy <= 10000 ? 6 + 4*Math.min(1,(10000-kpy)/5000) : clamp(6 - 6*(kpy-10000)/8000, 0, 6);
+  return {
+    ideal: clamp(10 - Math.abs(c.price - PF.ideal)/600, 0, 10),
+    fipe: d == null ? 3 : d > 0.35 ? 6 : clamp(3 + d*28, 0, 10),
+    kpy: kpyS,
+    km: c.km && c.km >= 1000 ? clamp((320000 - c.km)/22000, 0, 10) : 3,
+    ano: clamp((c.year - 2000)/1.4, 0, 10),
+    aut: f.autonomia_estrada_km ? clamp((f.autonomia_estrada_km - 350)/30, 0, 10) : 5,
+    pecas: man,
+    conf: f.nota_confiabilidade != null ? +f.nota_confiabilidade : 5,
+    viagem: f.nota_viagem != null ? +f.nota_viagem : 5,
+  };
+}
+function rankScore(c){
+  const p = parts(c); let sw = 0, sum = 0;
+  CRIT.forEach(([k]) => { sw += W[k]; sum += W[k]*p[k]; });
+  let s = sw ? sum/sw*10 : 50;
+  if (c.alerta) s -= 6;
+  if (c.gear === 'A' && p.pecas < 8) s -= 3;
+  return Math.round(clamp(s,0,100)*10)/10;
+}
+function renderWeights(){
+  $('#weights').innerHTML = CRIT.map(([k,label,hint]) => `<label class="wt" for="w-${k}"><span>${label}</span><b id="wv-${k}">${W[k]}</b>
+    <input type="range" id="w-${k}" data-w="${k}" min="0" max="10" step="1" value="${W[k]}"><small>${hint}</small></label>`).join('');
+  const cur = Object.keys(PRESETS).find(n => CRIT.every(([k]) => PRESETS[n][k] === W[k]));
+  $('#presets').innerHTML = Object.keys(PRESETS).map(n => `<button data-preset="${n}" aria-pressed="${n===cur}">${n}</button>`).join('');
+}
+function inPrice(c){ return c.price >= PF.min && c.price <= PF.max && (!PF.below || (c.fipe && c.price < c.fipe)); }
+
+function ficha(c){ return (DATA.models || {})[c.model]; }
+function cars(){
+  const base = DATA.cars.map(c => ({...c}));
+  const ids = new Set(base.map(c => String(c.id)));
+  Object.values(NEW).forEach(c => { if (!ids.has(String(c.id))) base.push({...c, isNew:true}); else base.find(b => String(b.id)===String(c.id)).isNew = true; });
+  return base.filter(c => !GONE[String(c.id)]);
+}
+function photoList(c){
+  const p = PHOTOS[String(c.id)];
+  if (p && p.length) return p.map(f => 'fotos/' + f);
+  if (c.source === 'OLX') return (c.photos || []).slice(0, 3).map(u => u.replace('/images/', '/thumbs500x500/'));
+  return [];
+}
+function deltaTag(c){
+  if (!c.fipe) return '<span class="delta warn">FIPE não informada</span>';
+  const d = (c.fipe - c.price) / c.fipe;
+  const cls = d > 0.30 ? 'warn' : d >= 0 ? 'good' : 'bad';
+  const txt = d >= 0 ? Math.round(d*100) + '% abaixo' : Math.round(-d*100) + '% acima';
+  return `<span class="delta ${cls}" title="${d>0.30?'Muito abaixo da FIPE: confira o motivo':''}">${txt}</span>`;
+}
+function photoBox(c){
+  if (EXPORT){
+    const ex = (PHOTOS[String(c.id)]||[]).map(id => EXPORT[id]).filter(Boolean);
+    return ex.length ? `<div class="ph strip">${ex.map(u => `<img src="${u}" alt="${esc(c.title)}">`).join('')}</div>`
+      : `<div class="ph"><div class="empty"><a href="${esc(c.url)}" target="_blank" rel="noopener">Ver fotos no anúncio ↗</a></div></div>`;
+  }
+  const ph = photoList(c), i = (((slide[c.id] || 0) % (ph.length||1)) + (ph.length||1)) % (ph.length||1);
+  if (!ph.length) return `<div class="ph"><div class="empty"><span>Sem foto salva</span><a href="${esc(c.url)}" target="_blank" rel="noopener">Ver fotos no anúncio ↗</a></div></div>`;
+  return `<div class="ph"><img src="${ph[i % ph.length]}" alt="${esc(c.title)}" loading="lazy" onerror="this.remove()">
+    <span class="count">${(i % ph.length)+1}/${ph.length}</span>
+    ${ph.length>1?`<div class="nav"><button aria-label="Foto anterior" data-prev="${c.id}">‹</button><button aria-label="Próxima foto" data-next="${c.id}">›</button></div>`:''}</div>`;
+}
+function scoreBar(c){
+  const s = rankScore(c);
+  return `<div class="score" title="Nota pelos pesos que você escolheu"><span>Nota</span><span class="meter"><i style="width:${s}%"></i></span><b>${s}</b></div>`;
+}
+function fichaBlock(c){
+  const f = ficha(c); if (!f) return '';
+  const li = a => (a||[]).map(x => `<li>${esc(x)}</li>`).join('');
+  return `<details><summary>Ficha do ${esc(f.modelo.split('(')[0].trim())}</summary><div class="ficha">
+    <div><h4>Potência</h4>${esc(f.potencia_cv)}</div>
+    <div><h4>Consumo (gasolina)</h4>Cidade ${esc(f.consumo_cidade)} km/l · Estrada ${esc(f.consumo_estrada)} km/l · tanque ${esc(f.tanque_l)} L</div>
+    <div><h4>Problemas crônicos</h4><ul>${li(f.problemas_cronicos)}</ul></div>
+    <div><h4>Pontos fortes</h4><ul>${li(f.pontos_fortes)}</ul></div>
+    <div class="src"><h4>Fontes</h4>${(f.fontes||[]).map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u.replace(/^https?:\/\/(www\.)?/,'').slice(0,60))}</a>`).join('<br>')}</div>
+  </div></details>`;
+}
+function kpyTag(c){
+  const k = kmPerYear(c); if (k == null) return '';
+  const cls = k < 2000 ? 'warn' : k <= 10000 ? 'good' : 'bad';
+  return `<br><span class="kpy ${cls}" title="${k<2000?'Quilometragem baixa demais para a idade: confira':'Referência: 10 mil km por ano'}">${(k/1000).toLocaleString('pt-BR',{maximumFractionDigits:1})} mil/ano</span>`;
+}
+function card(c){
+  const f = ficha(c) || {};
+  const tags = [c.isNew?'<span class="tag new">Novo</span>':'', c.ipva?'<span class="tag ok">IPVA pago</span>':'', c.alerta?'<span class="tag alert">Reparo citado</span>':'', c.gear==='A'?'<span class="tag">Automático</span>':'', `<span class="tag">${esc(c.city)}</span>`].join('');
+  return `<article class="card">${photoBox(c)}<div class="body">
+    <h3 class="ttl">${esc(c.title)}</h3>
+    <div class="price-row"><div class="price">${brl(c.price)}</div><div class="fipe">FIPE <span class="num">${brl(c.fipe)}</span><br>${deltaTag(c)}</div></div>
+    <dl class="specs"><div><dt>Ano</dt><dd>${c.year}</dd></div><div><dt>Rodagem</dt><dd>${kmf(c.km)}${kpyTag(c)}</dd></div>
+      <div><dt>Potência</dt><dd>${esc(String(f.potencia_cv||'—').split(/[;(]/)[0].replace(/cv.*/,'cv'))}</dd></div>
+      <div><dt>Autonomia</dt><dd>${f.autonomia_estrada_km?('~'+f.autonomia_estrada_km+' km'):'—'}</dd></div></dl>
+    <div class="tags">${tags}${f.manutencao?`<span class="lvl ${esc(f.manutencao)}">Manutenção ${esc(f.manutencao)}</span>`:''}</div>
+    ${scoreBar(c)}
+    <p class="note">${esc(c.desc)}</p>
+    ${fichaBlock(c)}
+    <div class="cta"><span class="src-badge">${esc(c.source)} · ${new Date(c.date+'T12:00').toLocaleDateString('pt-BR')}</span><a class="btn" href="${esc(c.url)}" target="_blank" rel="noopener">Ver anúncio ↗</a></div>
+  </div></article>`;
+}
+function why(c){
+  const f = ficha(c) || {}; const out = [];
+  if (f.nota_confiabilidade >= 7) out.push('modelo confiável');
+  if (f.manutencao === 'baixa') out.push('peças baratas');
+  if (f.nota_viagem >= 7) out.push('bom de estrada');
+  if (f.autonomia_estrada_km >= 650) out.push(`~${f.autonomia_estrada_km} km por tanque`);
+  if (c.fipe && c.price < c.fipe) out.push(Math.round((c.fipe-c.price)/c.fipe*100)+'% abaixo da FIPE');
+  if (c.km && c.km < 130000 && c.km > 1000) out.push('km baixo');
+  return out.slice(0,4).join(' · ');
+}
+function renderRank(list){
+  const top = list.filter(c => !c.alerta && inPrice(c)).sort((a,b) => (rankScore(b)||0)-(rankScore(a)||0)).slice(0,10);
+  $('#rank-why').textContent = `Entre ${brl(PF.min)} e ${brl(PF.max)}${PF.below?', abaixo da FIPE':''}. ` + 'Nota de 0 a 100 calculada com os pesos acima. ' + (()=>{const t=[...CRIT].sort((a,b)=>W[b[0]]-W[a[0]]).slice(0,3).map(x=>x[1].toLowerCase()); return `Hoje o que mais pesa: ${t.join(', ')}.`;})();
+  TOP = top;
+  $('#rank').innerHTML = (top.length ? '' : '<li style="color:var(--muted)">Nenhum carro sem reparo citado nessa faixa. Amplie o preço ou desmarque "Só abaixo da FIPE".</li>') + top.map((c,i) => `<li class="rk"><div style="position:relative">${photoBox(c)}<span class="pos">${i+1}º</span></div><div class="body">
+    <h3 class="ttl">${esc(c.title)}</h3>
+    <div class="price-row"><div class="price">${brl(c.price)}</div><div class="fipe">${c.year} · ${kmf(c.km)}<br>${esc(c.city)}</div></div>
+    ${scoreBar(c)}<p class="why">${esc(why(c))}</p>
+    <div class="cta"><span class="src-badge">FIPE ${brl(c.fipe)}</span><a class="btn" href="${esc(c.url)}" target="_blank" rel="noopener">Ver anúncio ↗</a></div></div></li>`).join('');
+}
+function renderGrid(all){
+  const city = $('#f-city').value, gear = $('#f-gear').value, q = $('#f-q').value.trim().toLowerCase(), clean = $('#f-clean').checked, sort = $('#f-sort').value;
+  let l = all.filter(c => inPrice(c) && (!city || c.city === city) && (!gear || c.gear === gear) && (!clean || !c.alerta) && (!q || c.title.toLowerCase().includes(q)));
+  const k = {score:c=>-(rankScore(c)||0), ideal:c=>Math.abs(c.price-PF.ideal), price:c=>c.price, fipe:c=>c.fipe?-(c.fipe-c.price)/c.fipe:1, km:c=>c.km>1000?c.km:9e9, kpy:c=>kmPerYear(c) ?? 9e9, year:c=>-c.year, date:c=>-new Date(c.date)}[sort];
+  l.sort((a,b) => k(a)-k(b));
+  SHOWN = l;
+  $('#res').textContent = l.length + ' carros';
+  $('#grid').innerHTML = l.map(card).join('') || '<p>Nenhum carro com esses filtros.</p>';
+}
+function renderModels(all){
+  const cnt = {}; all.forEach(c => cnt[c.model] = (cnt[c.model]||0)+1);
+  const man = {baixa:10,'média':6,media:6,alta:3};
+  const rows = Object.values(DATA.models).filter(m => cnt[m.key]).map(m => ({...m, s: m.nota_confiabilidade*.4 + (man[m.manutencao]||6)*.3 + m.nota_viagem*.2 + Math.min(10,Math.max(0,(m.autonomia_estrada_km-350)/30))*.1}))
+    .sort((a,b) => b.s-a.s);
+  $('#models').innerHTML = rows.map(m => `<tr><td><b>${esc(m.modelo.split('(')[0].trim())}</b></td><td class="n">${cnt[m.key]}</td><td>${esc(String(m.potencia_cv).split(';')[0])}</td>
+    <td class="n">${esc(String(m.consumo_estrada).split('(')[0].trim())} km/l</td><td class="n">~${m.autonomia_estrada_km} km</td>
+    <td><span class="lvl ${esc(m.manutencao)}">${esc(m.manutencao)}</span></td><td class="n">${m.nota_confiabilidade}/10</td><td class="n">${m.nota_viagem}/10</td><td>${esc((m.problemas_cronicos||[])[0]||'')}</td></tr>`).join('');
+}
+function renderAll(){
+  const all = cars().sort((a,b) => rankScore(b)-rankScore(a));
+  renderPrice(all); renderRank(all); renderGrid(all); renderModels(all);
+  const nPh = Object.keys(PHOTOS).length;
+  $('#facts').innerHTML = `<span class="chip"><span class="num">${all.length}</span> carros</span>
+    ${(()=>{const n={}; all.forEach(c=>n[c.source]=(n[c.source]||0)+1); return `<span class="chip"><span class="dot"></span>OLX · ${n.OLX||0}</span><span class="chip${n.Facebook?'':' off'}"><span class="dot"></span>Facebook · ${n.Facebook||0}</span><span class="chip off" title="O Mercado Livre exige uma verificação de segurança que só você pode resolver"><span class="dot"></span>Mercado Livre: verificação pendente</span>`;})()}`;
+  $('#prog').textContent = nPh ? `${nPh} carros com fotos` : '';
+  $('#foot').textContent = `Dados de ${new Date((DATA.lastRun||DATA.updated)+'T12:00').toLocaleDateString('pt-BR')}. Preços e disponibilidade mudam rápido; confirme com o vendedor.`;
+}
+function renderPrice(all){
+  const lo = 12000, hi = 20000, w = hi - lo;
+  $('#p-min').value = PF.min; $('#p-max').value = PF.max; $('#p-below').checked = PF.below;
+  $('#pb-fill').style.left = ((PF.min-lo)/w*100)+'%'; $('#pb-fill').style.right = ((hi-PF.max)/w*100)+'%';
+  $('#pb-label').innerHTML = `${brl(PF.min)} – ${brl(PF.max)}<small>ideal ${brl(PF.ideal)}</small>`;
+  const n = all.filter(inPrice).length;
+  $('#pb-count').textContent = `${n} de ${all.length} carros nessa faixa${PF.below?' e abaixo da FIPE':''}`;
+  const buckets = []; for (let v = lo; v < hi; v += 500) buckets.push(v);
+  const cnt = buckets.map(v => all.filter(c => c.price >= v && (c.price < v+500 || (v+500===hi && c.price===hi)) && (!PF.below || (c.fipe && c.price < c.fipe))).length);
+  const mx = Math.max(1, ...cnt);
+  $('#hist').innerHTML = buckets.map((v,i) => `<i class="${v<=PF.ideal&&PF.ideal<v+500?'ideal':(v>=PF.min&&v<PF.max?'on':'')}" style="height:${cnt[i]/mx*100}%" title="${brl(v)}–${brl(v+500)}: ${cnt[i]} carros"></i>`).join('');
+}
+const idealSel = $('#p-ideal');
+for (let v = 12000; v <= 20000; v += 500) idealSel.insertAdjacentHTML('beforeend', `<option value="${v}">${brl(v)}</option>`);
+idealSel.value = PF.ideal;
+$('#p-min').addEventListener('input', e => { PF.min = Math.min(+e.target.value, PF.max - 500); savePF(); renderAll(); });
+$('#p-max').addEventListener('input', e => { PF.max = Math.max(+e.target.value, PF.min + 500); savePF(); renderAll(); });
+idealSel.addEventListener('change', e => { PF.ideal = +e.target.value; savePF(); renderAll(); });
+$('#p-below').addEventListener('change', e => { PF.below = e.target.checked; savePF(); renderAll(); });
+renderWeights();
+$('#weights').addEventListener('input', e => { const k = e.target.dataset.w; if (!k) return; W[k] = +e.target.value; $('#wv-'+k).textContent = W[k]; saveW();
+  const cur = Object.keys(PRESETS).find(n => CRIT.every(([q]) => PRESETS[n][q] === W[q]));
+  document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', b.dataset.preset === cur)); renderAll(); });
+$('#presets').addEventListener('click', e => { const n = e.target.closest('[data-preset]')?.dataset.preset; if (!n) return; Object.assign(W, PRESETS[n]); saveW(); renderWeights(); renderAll(); });
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-prev],[data-next]'); if (!b) return;
+  const id = b.dataset.prev || b.dataset.next; slide[id] = (slide[id]||0) + (b.dataset.next ? 1 : -1);
+  renderAll();
+});
+['#f-city','#f-gear','#f-sort','#f-clean','#f-q'].forEach(s => $(s).addEventListener('input', () => renderGrid(cars())));
+
+
+
+(async () => {
+  try { DATA = await (await fetch('data.json', {cache: 'no-cache'})).json(); } catch(e){ document.querySelector('main').innerHTML = '<div class="wrap"><p>Não consegui carregar os dados. Recarregue a página.</p></div>'; return; }
+  $('#cities').innerHTML = DATA.cities.map(c => `<span>${esc(c)}</span>`).join('');
+  $('#f-city').innerHTML += DATA.cities.map(c => `<option>${esc(c)}</option>`).join('');
+  try { const f = await (await fetch('fotos/index.json', {cache: 'no-cache'})).json(); PHOTOS = {}; f.forEach(n => { const m = n.match(/^(\d+)_\d+\./); if (m) (PHOTOS[m[1]] = PHOTOS[m[1]] || []).push(n); }); } catch(e) {}
+  (DATA.novos || []).forEach(c => NEW[String(c.id)] = c);
+  (DATA.saiu || []).forEach(id => GONE[String(id)] = true);
+  renderAll();
+})();
+</script>
+</body></html>
