@@ -116,6 +116,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .filters select,.filters input{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:8px 10px;font-size:14px;min-width:0}
 .filters input{flex:1 1 180px}
 .filters .res{margin-left:auto;font-size:14px;color:var(--muted)}
+.btn.ghost[aria-pressed="true"]{background:var(--plate);color:var(--plate-ink)}
 
 /* tabela de modelos */
 .tbl-wrap{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:10px}
@@ -229,6 +230,7 @@ footer .wrap{padding-block:26px 40px;color:var(--muted);font-size:13px}
         <option value="fipe">Mais abaixo da FIPE</option><option value="km">Menor km</option><option value="kpy">Menor km por ano</option>
         <option value="year">Mais novo</option><option value="date">Anunciado há menos tempo</option>
       </select>
+      <button type="button" class="btn ghost" id="f-48" aria-pressed="false" title="Carros que entraram na busca nas últimas 48 horas">Últimas 48h</button>
       <label class="chip" style="cursor:pointer"><input type="checkbox" id="f-clean"> Esconder anúncios com reparo citado</label>
       <input id="f-q" type="search" placeholder="Buscar modelo, ex.: Fiesta" aria-label="Buscar modelo">
       <span class="res" id="res"></span>
@@ -327,6 +329,10 @@ function renderWeights(){
   $('#presets').innerHTML = Object.keys(PRESETS).map(n => `<button data-preset="${n}" aria-pressed="${n===cur}">${n}</button>`).join('');
 }
 function inPrice(c){ return c.price >= PF.min && c.price <= PF.max && (!PF.below || (c.fipe && c.price < c.fipe)); }
+// Últimas 48h: usa a hora em que o carro entrou na busca (added); sem isso, a data do anúncio.
+let RECENT = false;
+function entered(c){ const s = String(c.added || c.date || ''); if (!s) return 0; const t = new Date(s.length <= 10 ? s + 'T12:00' : s).getTime(); return isNaN(t) ? 0 : t; }
+function isRecent(c){ return Date.now() - entered(c) <= 48*3600*1000; }
 
 function ficha(c){ return (DATA.models || {})[c.model]; }
 function cars(){
@@ -418,11 +424,13 @@ function renderRank(list){
 }
 function renderGrid(all){
   const city = $('#f-city').value, gear = $('#f-gear').value, q = $('#f-q').value.trim().toLowerCase(), clean = $('#f-clean').checked, sort = $('#f-sort').value;
-  let l = all.filter(c => inPrice(c) && (!city || c.city === city) && (!gear || c.gear === gear) && (!clean || !c.alerta) && (!q || c.title.toLowerCase().includes(q)));
+  let l = all.filter(c => inPrice(c) && (!city || c.city === city) && (!gear || c.gear === gear) && (!clean || !c.alerta) && (!q || c.title.toLowerCase().includes(q)) && (!RECENT || isRecent(c)));
   const k = {score:c=>-(rankScore(c)||0), ideal:c=>Math.abs(c.price-PF.ideal), price:c=>c.price, fipe:c=>c.fipe?-(c.fipe-c.price)/c.fipe:1, km:c=>c.km>1000?c.km:9e9, kpy:c=>kmPerYear(c) ?? 9e9, year:c=>-c.year, date:c=>-new Date(c.date)}[sort];
   l.sort((a,b) => k(a)-k(b));
   SHOWN = l;
-  $('#res').textContent = l.length + ' carros';
+  const nRec = all.filter(isRecent).length;
+  $('#f-48').textContent = `Últimas 48h · ${nRec}`;
+  $('#res').textContent = RECENT ? `${l.length} de ${nRec} carros das últimas 48h nesta faixa de preço` : l.length + ' carros';
   $('#grid').innerHTML = l.map(card).join('') || '<p>Nenhum carro com esses filtros.</p>';
 }
 function renderModels(all){
@@ -473,6 +481,7 @@ document.addEventListener('click', e => {
   renderAll();
 });
 ['#f-city','#f-gear','#f-sort','#f-clean','#f-q'].forEach(s => $(s).addEventListener('input', () => renderGrid(cars())));
+$('#f-48').addEventListener('click', e => { RECENT = !RECENT; e.currentTarget.setAttribute('aria-pressed', RECENT); renderGrid(cars()); });
 
 
 
