@@ -12,6 +12,7 @@ for c in h.get('novos', []):
     c['desc'] = PHONE.sub('[telefone no anúncio]', c.get('desc') or '')
     c.setdefault('added', datetime.datetime.now().astimezone().isoformat(timespec='minutes'))  # para o filtro Últimas 48h
     d.setdefault('novos', []).append(c); add += 1
+    have.add(str(c['id']))  # o mesmo id repetido no próprio hoje.json não entra duas vezes
 d['saiu'] = sorted(set(map(str, d.get('saiu', []))) | set(map(str, h.get('saiu', []))))
 d['lastRun'] = datetime.date.today().isoformat()
 json.dump(d, open('data.json', 'w', encoding='utf-8'), ensure_ascii=False)
