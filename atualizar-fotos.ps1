@@ -26,6 +26,8 @@ foreach ($file in (Get-ChildItem $src -Filter *.jpg | Where-Object { $_.Name -ma
 }
 $lista = Get-ChildItem $dst -Filter *.jpg | Sort-Object Name | ForEach-Object { $_.Name }
 ConvertTo-Json @($lista) -Compress | Set-Content -Encoding UTF8 (Join-Path $dst 'index.json')
+# FIPE média por modelo/ano (tools/fipe.py); se falhar, segue com o commit normalmente
+try { python (Join-Path $repo 'tools\fipe.py') 2>&1 | Out-Host } catch { "fipe.py falhou: $_" }
 git add -A
 git diff --cached --quiet
 if ($LASTEXITCODE -ne 0) { git commit -m "Atualização diária: $novas fotos novas" --quiet; git push --quiet 2>&1 | Out-Null }
